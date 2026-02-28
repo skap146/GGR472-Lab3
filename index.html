@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- Viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Import Mapbox and Mapbox JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- Bootstrap Link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Link to stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<!-- Navigation Bar and Buttons -->
+<nav class="navbar navbar-expand-lg red-nav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Menu</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-3">
+                <li class="nav-item">
+                    <a class="btn btn-danger" href="index.html" id="home">Crime Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-danger" href="nearest_crime.html" id="behind_the_scenes">Nearest Crime</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Title text -->
+<h1 class="text-center title">Analyzing Crime in Toronto</h1>
+
+<!-- Message -->
+<p class="text-center message">This map looks at 2024 crime data in the city of Toronto. You can filter by crime type and/or
+the month the crimes occurred. Click on a crime point (a black point) to learn more about it. You'll also notice that
+Toronto is split up into wards on the map. You can classify wards by education, employment, or youth. Have fun
+exploring!</p>
+
+<!-- Bootstrap column layout (for webpage organization) -->
+<div class="row">
+    <div class="col-md-4">
+        <!-- Classify wards selection  -->
+<div class="form-group">
+    <label for="wards-classification" class="dropdown-title">Classify Wards By:</label>
+    <select id="wards-classification" class="form-control">
+        <option value="Pop % with Bachelor Degree or Higher">Pop % with Bachelor Degree or Higher</option>
+        <option value="Pop % considered Youth">Pop % considered Youth</option>
+        <option value="% Unemployed">% Unemployed</option>
+    </select>
+</div>
+    </div>
+        <div class="col-md-4">
+        <!-- Filter crimes by month selection  -->
+<div class="form-group">
+    <label for="month-filter" class="dropdown-title">Month:</label>
+    <select id="month-filter" class="form-control">
+        <option value="All">All</option>
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+    </select>
+</div>
+        </div>
+        <div class="col-md-4">
+            <!-- Filter crimes by crime type  -->
+            <div class="form-group">
+                <label for="crime-type-classification" class="dropdown-title">Crime Type:</label>
+                <select id="crime-type-classification" class="form-control">
+                    <option value="All">All</option>
+                    <option value="Assault">Assault</option>
+                    <option value="Break and Enter">Break and Enter</option>
+                    <option value="Theft Over">Theft Over</option>
+                    <option value="Robbery">Robbery</option>
+                </select>
+            </div>
+
+        </div>
+</div>
+
+<!-- Add map -->
+<div id="my-map" class="map-container-ca"></div>
+
+<!-- Add legend -->
+<div id='legend' class='legend'>
+    <h4 class="legend-title" id="legend-title">% of Pop Obtained Bachelor's or Higher.</h4>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
