@@ -69,6 +69,12 @@
     justify-content: center;
 }
 
+/* Nearest distance dropdown positioning */
+.dist-menu
+{
+    width: 30%;
+}
+
 .legend-title {
     color: black;
     font-size: 20px;

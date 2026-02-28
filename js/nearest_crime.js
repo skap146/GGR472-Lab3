@@ -1,3 +1,18 @@
+// Initialize array to store crime data
+let crime_data = [];
+
+// Load the crime data (we don't want to load it more than once)
+load_crime_data()
+function load_crime_data()
+{
+    fetch('data/crimes_2024.geojson')
+        .then(response => {
+            return response.json()})
+        .then(data => {
+             crime_data = data.features;
+        })
+}
+
 // Mapbox Access Token
 mapboxgl.accessToken = 'pk.eyJ1Ijoia2FwY2Fuc2giLCJhIjoiY21rNDRqY3NyMDN6OTNlb2p0MGNoMmt3NyJ9.dJfye3FVRxijxl2_diGcPQ';
 
@@ -40,42 +55,33 @@ geocoder.on("result", function(result)
     address_point = turf.point(coords,
         {"marker-color": "#0F0"})
 
-    // Load crime data for turf analysis
-    fetch('data/crimes_2024.geojson')
-        .then(response => {
-            return response.json()})
-        .then(data => {
-            let crime_data = data.features;
+    // Load crime features onto turf
+    crime_points = turf.featureCollection(crime_data);
 
-            // Load crime features onto turf
-            crime_points = turf.featureCollection(crime_data);
+    // Obtain current_dist value
+    curr_dist = document.getElementById('crime-dist').value;
 
-            // Obtain current_dist value
-            curr_dist = document.getElementById('crime-dist').value;
+    // Render the crimes on the map
+    render_crimes(address_point, crime_points, curr_dist);
 
-            // Render the crimes on the map
-            render_crimes(address_point, crime_points, curr_dist);
+    // Trigger a pop up when the user clicks on a crime point
+    toronto_map.addInteraction('crime-points-interaction', {
+        type: 'click',
+        target: { layerId: 'nearest_crimes_point'},
+        handler: (e) => {
+            // Copy coordinates array.
+            const coordinates = e.feature.geometry.coordinates.slice();
+            const day = e.feature.properties['REPORT_DAY'];
+            const month = e.feature.properties['REPORT_MONTH'];
+            const type = e.feature.properties['MCI_CATEGORY'];
+            console.log(coordinates);
 
-            // Trigger a pop up when the user clicks on a crime point
-            toronto_map.addInteraction('crime-points-interaction', {
-                type: 'click',
-                target: { layerId: 'nearest_crimes_point'},
-                handler: (e) => {
-                    // Copy coordinates array.
-                    const coordinates = e.feature.geometry.coordinates.slice();
-                    const day = e.feature.properties['REPORT_DAY'];
-                    const month = e.feature.properties['REPORT_MONTH'];
-                    const type = e.feature.properties['MCI_CATEGORY'];
-                    console.log(coordinates);
-
-                    new mapboxgl.Popup()
-                        .setLngLat(coordinates)
-                        .setHTML('Crime: ' + type + '<br>' + 'Date: ' + month + ' ' + day)
-                        .addTo(toronto_map);
-                }
-            })
-        })
-
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML('Crime: ' + type + '<br>' + 'Date: ' + month + ' ' + day)
+                .addTo(toronto_map);
+        }
+    })
 }
 )
 
