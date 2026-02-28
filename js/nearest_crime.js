@@ -53,6 +53,7 @@ geocoder.on("result", function(result)
             // Obtain current_dist value
             curr_dist = document.getElementById('crime-dist').value;
 
+            // Render the crimes on the map
             render_crimes(address_point, crime_points, curr_dist);
 
             // Trigger a pop up when the user clicks on a crime point
