@@ -45,7 +45,7 @@
 
 <!-- Message -->
 <p class="text-center message">This map looks at 2024 crime data in the city of Toronto. You can filter by crime type and/or
-the month the crimes occurred. Click on a crime point (a black point) to learn more about it. You'll also notice that
+the month the crimes occurred. Click on a crime point (a black point) or a ward to learn more about it. You'll also notice that
 Toronto is split up into wards on the map. You can classify wards by education, employment, or youth. Have fun
 exploring!</p>
 
@@ -100,7 +100,20 @@ exploring!</p>
 </div>
 
 <!-- Add map -->
-<div id="my-map" class="map-container-ca"></div>
+<div id="my-map" class="map-container-ca">
+    <!-- Toggle layers on/off by checkbox -->
+    <div id="layer_toggle">
+        <h4 class="text-center"> Display Layers </h4>
+        <label>
+            <input type="checkbox" value="tor-wards-polygon" onchange="toggleLayer(value)" checked>
+            Wards
+        </label><br>
+        <label>
+            <input type="checkbox" value="tor-crime-points" onchange="toggleLayer(value)" checked>
+            Crime Points
+        </label><br>
+    </div>
+</div>
 
 <!-- Add legend -->
 <div id='legend' class='legend'>

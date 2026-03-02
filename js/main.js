@@ -66,21 +66,20 @@ bachelor_legend_items.forEach(({ label, color }) => {
     text.className = 'legend-text';
     text.textContent = label;
 
-    console.log(colrect);
-
     row.append(colrect, text);
     legend.appendChild(row);
 });
 toronto_map.on('load', () =>
 {
     // Add the Toronto neighbourhoods geoJSON dataset
-    toronto_map.addSource('tor-wards-data', {type: 'geojson',data: 'data/ward_data.geojson'});
+    toronto_map.addSource('tor-wards-data', {type: 'geojson',data: 'data/ward_data.geojson', promoteId: '_id'});
 
     // Add the Toronto crime data geoJSON dataset
     toronto_map.addSource('tor-crime-data', {type: 'geojson',data: 'data/crimes_2024.geojson'});
 
     // Visualize the Toronto neighbourhoods dataset on the map
     // % Obtained Bachelor's Degree or Higher Choropleth Map
+    // Hovering over a neighbourhood will highlight it
     toronto_map.addLayer({
         'id': 'tor-wards-polygon',
         'type': 'fill',
@@ -96,7 +95,12 @@ toronto_map.on('load', () =>
                 bachelor_intervals[3], color_scheme_bachelor[4]
             ], // Test alternative colours and style properties
             'fill-opacity': 1,
-            'fill-outline-color': 'black'
+            'fill-outline-color': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                'yellow',
+                'black'
+            ]
         }
     });
 
@@ -119,25 +123,79 @@ toronto_map.on('load', () =>
             'circle-color': 'black'
         },
     });
+})
 
-    // Trigger a pop up when the user clicks on a crime point
-    toronto_map.addInteraction('crime-points-interaction', {
-        type: 'click',
-        target: { layerId: 'tor-crime-points'},
-        handler: (e) => {
-            // Copy coordinates array.
-            const coordinates = e.feature.geometry.coordinates.slice();
-            const day = e.feature.properties['REPORT_DAY'];
-            const month = e.feature.properties['REPORT_MONTH'];
-            const type = e.feature.properties['MCI_CATEGORY'];
-            console.log(coordinates);
+// Update hover state of Toronto wards
+let wardID = null; // Declare initial province ID as null
 
-            new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML('Crime: ' + type + '<br>' + 'Date: ' + month + ' ' + day)
-                .addTo(toronto_map);
-        }
-    })
+toronto_map.on('mousemove', 'tor-wards-polygon', (e) => {
+
+    // Set hover feature state back to false to remove highlight from previous highlighted polygon
+    toronto_map.setFeatureState(
+        { source: 'tor-wards-data', id: wardID },
+        { hover: false }
+    );
+
+
+    // Highlight currently hovered over polygon
+    console.log(e.features[0].id);
+    wardID = e.features[0].id;
+    toronto_map.setFeatureState(
+        { source: 'tor-wards-data', id: wardID },
+        { hover: true }
+    );
+
+});
+
+// If mouse leaves the geojson layer, all hover feature states are set to false and nothing is highlighted
+toronto_map.on('mouseleave', 'tor-wards-polygon', () => {
+
+    toronto_map.setFeatureState(
+        { source: 'tor-wards-data', id: wardID },
+        { hover: false }
+    );
+
+    wardID = null;
+});
+
+// Trigger a pop up when the user clicks on a crime point
+toronto_map.addInteraction('crime-points-interaction', {
+    type: 'click',
+    target: { layerId: 'tor-crime-points'},
+    handler: (e) => {
+        // Copy coordinates array.
+        const coordinates = e.feature.geometry.coordinates.slice();
+        const day = e.feature.properties['REPORT_DAY'];
+        const month = e.feature.properties['REPORT_MONTH'];
+        const type = e.feature.properties['MCI_CATEGORY'];
+
+        new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML('Crime: ' + type + '<br>' + 'Date: ' + month + ' ' + day)
+            .addTo(toronto_map);
+    }
+})
+
+// Trigger a pop up when the user clicks on a ward
+toronto_map.addInteraction('wards-interaction', {
+    type: 'click',
+    target: {'layerId': 'tor-wards-polygon'},
+    handler: (e) => {
+        const ward_id = e.feature.properties["_id"];
+        const unemployment_rate = e.feature.properties[unemployment_field]
+        const youth_rate = ((e.feature.properties[youth_fields[0]] + e.feature.properties[youth_fields[1]])
+        / e.feature.properties[total_pop_field]) * 100;
+        const bachelor_rate = (e.feature.properties[bachelor_deg_field] / e.feature.properties[total_pop_field]) * 100;
+
+        new mapboxgl.Popup()
+            // Set the pop up to display at the coordinates of mouse click
+            .setLngLat(e.lngLat)
+            .setHTML("Ward " + ward_id +
+            "<br> % Unemployment: " + unemployment_rate +
+                "<br> % Youth (Ages 20-29): " + youth_rate.toFixed(1) +
+            "<br> % Obtained Bachelor's or Higher: " + bachelor_rate.toFixed(1))
+            .addTo(toronto_map); // Show popup on map
+    }
 })
 
 // Retrieve ward classification dropdown element
@@ -148,8 +206,6 @@ ward_classification.addEventListener('change', () => {
     // Extract user selected ward classification and ward layer id
     const classify_value = ward_classification.value;
     const ward_layer_id = 'tor-wards-polygon';
-
-    console.log(classify_value);
 
     // ages 20-29 considered youth
     // we have fields of ages 20-24 and 25-29, so I added them together
@@ -185,7 +241,7 @@ ward_classification.addEventListener('change', () => {
         toronto_map.setPaintProperty(ward_layer_id, 'fill-color', bach_classification_scheme);
 
         // Update legend to fit bachelor degree classification scheme
-        legend_update(bachelor_legend_items, "% of Pop Obtained Bachelor's or Higher.")
+        legend_update(bachelor_legend_items, "% of Pop Obtained Bachelor's or Higher")
     }
     if (classify_value === '% Unemployed')
     {
@@ -202,7 +258,7 @@ ward_classification.addEventListener('change', () => {
         toronto_map.setPaintProperty(ward_layer_id, 'fill-color', unemployment_classification_scheme);
 
         // Update legend to fit bachelor degree classification scheme
-        legend_update(unemployment_items, "% Unemployed.")
+        legend_update(unemployment_items, "% of Pop Unemployed")
     }
 })
 
@@ -212,7 +268,6 @@ let crime_filter_type = document.getElementById('crime-type-classification');
 
 // Add event listeners for when either crime filter changes value
 crime_filter_month.addEventListener('change', () => {
-    console.log('month-filter change');
     // filter values for crimes (multivariate)
     let month = crime_filter_month.value
     let type = crime_filter_type.value
@@ -220,7 +275,6 @@ crime_filter_month.addEventListener('change', () => {
     filter_crimes(month, type);
 })
 crime_filter_type.addEventListener('change', () => {
-    console.log('crime-type change');
     // filter values for crimes (multivariate)
     let month = crime_filter_month.value
     let type = crime_filter_type.value
@@ -284,8 +338,23 @@ function legend_update(legend_items, title) {
 
         index++;
     })
+}
 
+// Toggle layers on the map
+// React to checkbox being enabled/disabled on map
+function toggleLayer(layer_id)
+{
+    const visibility = toronto_map.getLayoutProperty(layer_id, 'visibility');
 
+    // Toggle the visibility of the layer
+    if (visibility === 'none')
+    {
+        toronto_map.setLayoutProperty(layer_id, 'visibility', 'visible');
+    }
+    else
+    {
+        toronto_map.setLayoutProperty(layer_id, 'visibility', 'none');
+    }
 }
 
 

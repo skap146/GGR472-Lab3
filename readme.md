@@ -42,7 +42,8 @@ All data is sourced from Toronto Open Data Portal.
 ## Main Map: Crime Analysis
 
 - Located on the map are numerous black points. Clicking on a point displays
-information regarding the type and date of the crime that occurred there.
+information regarding the type and date of the crime that occurred there. Clicking on  a ward
+shows you the ward number and some information about the ward.
 
 
 - This project supports filtering crime by month of occurrence and/or type of crime. Just change the month or type in the dropdown
@@ -56,8 +57,12 @@ selection menu above the map and the map will update with data that meets the fi
 
 - The wards can also be classified by different metrics. They can be classified by % of ward population considered youth (ages 20-29), % of ward population
 who have obtained a bachelor's degree or higher, and % of ward population that is unemployed.
+- 
+
+- Finally, you can toggle the ward and crime layers on or off at any time by checking the layers on or off in the Display Layers menu.
 
 ![January Assault Example](images/jan_assaults.png)
+![Ward Example](images/ward.png)
 
 ## Bonus Map: Nearest Crimes
 
