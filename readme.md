@@ -35,6 +35,24 @@ since it is the latest year with all months updated.
 
 All data is sourced from Toronto Open Data Portal.
 
+Link: https://open.toronto.ca/
+
+---
+
+# Files
+
+Here are important files and their main purposes:
+
+```main.js``` - Handles the logic for the Crime Analysis map
+
+```nearest_crime.js``` - Handles the logic for the Nearest Crime map (incorporating Turf which is new at this point in GGR472)
+
+```style.css``` - All positioning and styling for this site is handled here
+
+```index.html``` -  Handles webpage structure for Crime Analysis page
+
+```nearest_crime.html``` - Handles webpage structure for Nearest Crime page
+
 ---
 
 # How to Use
